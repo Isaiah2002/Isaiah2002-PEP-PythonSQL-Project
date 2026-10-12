@@ -141,7 +141,7 @@ def write_ordered_calls(csv_file_path):
 
         # loops through the results of the query
         for row in cursor:
-            row = ",".join(str(value) for value in row)
+            row = ",".join(str(value) for value in row) # converts each value into a string and joins them with a comma
             orderedCalls.write(row + "\n")
 
 
