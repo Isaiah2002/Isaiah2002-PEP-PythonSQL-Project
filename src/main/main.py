@@ -41,7 +41,7 @@ def main():
     write_ordered_calls(os.path.join(_RESOURCES_DIR, 'orderedCalls.csv'))
 
     # Helper method that prints the contents of the users and callLogs tables. Uncomment to see data.
-    select_from_users_and_call_logs()
+    # select_from_users_and_call_logs()
 
     # Close the cursor and connection. main function ends here.
     cursor.close()
@@ -97,6 +97,13 @@ def load_and_clean_call_logs(file_path):
             # skips rows with empty values
             if not all(row):
                 continue
+            # checks if the userID(FK) in callLogs table maps to a userID in the users table
+            check_userId = "SELECT 1 FROM users WHERE userId = ?"
+            fk_value = row[-1]
+            cursor.execute(check_userId, (fk_value, ))
+            isExist = cursor.fetchone()
+            if isExist is None:
+                continue
             # inserts the values of each row into the tables as a records
             cursor.execute('''INSERT INTO callLogs (phoneNumber, startTime, endTime, direction, userId) VALUES (?, ?, ?, ?, ?)''', row)
     #updates the database and callLogs tables with changes
@@ -107,8 +114,19 @@ def load_and_clean_call_logs(file_path):
 # You must save records consisting of each userId, avgDuration, and numCalls
 # example: 1,105.0,4 - where 1 is the userId, 105.0 is the avgDuration, and 4 is the numCalls.
 def write_user_analytics(csv_file_path):
+    #print("TODO: write_user_analytics")
+    with open(csv_file_path, 'w', ) as testAnalytics:
+            # returns the results of userId, avgDuration, and numCalls
+            cursor.execute("SELECT userId, AVG(endTime - startTime), COUNT(*) FROM callLogs GROUP BY userId ORDER BY userId")
 
-    print("TODO: write_user_analytics")
+            #includes the header each time the function to avoid truncating unwanted things
+            testAnalytics.write("userId,avgDuration,numCalls\n")
+            # loops through the results of the query
+            for row in cursor:
+                row = ",".join(str(value) for value in row) # combines each value in a row into x,y,z, also coverting to string
+                testAnalytics.write(row + "\n") # writing the string row to the csv file
+
+
 
 
 # This function will write the callLogs ordered by userId, then start time.
