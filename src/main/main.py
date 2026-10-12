@@ -97,13 +97,14 @@ def load_and_clean_call_logs(file_path):
             # skips rows with empty values
             if not all(row):
                 continue
-            # checks if the userID(FK) in callLogs table maps to a userID in the users table
-            check_userId = "SELECT 1 FROM users WHERE userId = ?"
-            fk_value = row[-1]
-            cursor.execute(check_userId, (fk_value, ))
-            isExist = cursor.fetchone()
-            if isExist is None:
-                continue
+            ### checks if the userID(FK) in callLogs table maps to a userID in the users table
+            # check_userId = "SELECT 1 FROM users WHERE userId = ?"
+            # fk_value = row[-1]
+            # cursor.execute(check_userId, (fk_value, ))
+            # isExist = cursor.fetchone()
+            # if isExist is None:
+            #    continue
+
             # inserts the values of each row into the tables as a records
             cursor.execute('''INSERT INTO callLogs (phoneNumber, startTime, endTime, direction, userId) VALUES (?, ?, ?, ?, ?)''', row)
     #updates the database and callLogs tables with changes
