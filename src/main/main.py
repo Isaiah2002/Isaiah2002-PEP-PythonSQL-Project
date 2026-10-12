@@ -142,7 +142,7 @@ def write_ordered_calls(csv_file_path):
         # loops through the results of the query
         for row in cursor:
             row = ",".join(str(value) for value in row)
-            orderedCalls.write(row)
+            orderedCalls.write(row + "\n")
 
 
 
