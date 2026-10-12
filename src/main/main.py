@@ -41,7 +41,7 @@ def main():
     write_ordered_calls(os.path.join(_RESOURCES_DIR, 'orderedCalls.csv'))
 
     # Helper method that prints the contents of the users and callLogs tables. Uncomment to see data.
-    # select_from_users_and_call_logs()
+    select_from_users_and_call_logs()
 
     # Close the cursor and connection. main function ends here.
     cursor.close()
@@ -53,14 +53,54 @@ def main():
 
 # This function will load the users.csv file into the users table, discarding any records with incomplete data
 def load_and_clean_users(file_path):
+    #print("TODO: load_users")
+    with open(file_path, 'r', newline='') as userFile: # opens the file path to read
+        # reads the file one row at a time
+        reader = csv.reader(userFile)
 
-    print("TODO: load_users")
+        # we're looking at each row as a list of values
+        for row in reader:
+            # removes any unnecessary characters from the records 
+            row = [value.strip() for value in row]
+            # checks if there's a value and skips the first row becasue they're column labels
+            if row and row[0].lower() == "firstname": 
+                continue
+            # skips rows that doesn't have at exectly two column values
+            if len(row) != 2:
+                continue
+            # skips rows with empty values
+            if not all(row):
+                continue
+            # inserts the values in users.csv into users table
+            cursor.execute('''INSERT INTO users (firstname, lastname) VALUES (?, ?)''', row)
+    # updates the database and users table with changes
+    conn.commit() 
 
 
 # This function will load the callLogs.csv file into the callLogs table, discarding any records with incomplete data
 def load_and_clean_call_logs(file_path):
+    #print("TODO: load_call_logs")
+    with open(file_path, 'r', newline='') as callLogs:
+        # reads the file one row at a time 
+        reader = csv.reader(callLogs)
 
-    print("TODO: load_call_logs")
+        # looking at each row as a list of values
+        for row in reader:
+            # removes any unnecessary characters from the values:
+            row = [value.strip() for value in row]
+            # checks if there is a value and skips the first row
+            if row and row[0].lower() == "phonenumber":
+                continue
+            # skips the row if it doesn't have exactly five column values
+            if len(row) != 5:
+                continue
+            # skips rows with empty values
+            if not all(row):
+                continue
+            # inserts the values of each row into the tables as a records
+            cursor.execute('''INSERT INTO callLogs (phoneNumber, startTime, endTime, direction, userId) VALUES (?, ?, ?, ?, ?)''', row)
+    #updates the database and callLogs tables with changes
+    conn.commit()
 
 
 # This function will write analytics data to testUserAnalytics.csv - average call time, and number of calls per user.
